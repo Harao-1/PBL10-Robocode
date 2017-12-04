@@ -12,6 +12,10 @@ public class G10_Leader extends TeamRobot
 	/**
 	 * run: G10_Leader's default behavior
 	 */
+
+	private Set<FixedPointer> fixedPointerMap = new HashSet<FixedPointer>();
+	private MovingRobotMap movingRobotMap = new MovingRobotMap();
+
 	public void run() {
 		// Initialization of the robot should be put here
 
@@ -35,6 +39,8 @@ public class G10_Leader extends TeamRobot
 	 */
 	public void onScannedRobot(ScannedRobotEvent e) {
 		// Replace the next line with any behavior you would like
+		MovingRobot theScannedRobot = new MovingRobot(e, this);
+		movingRobotMap.updateTheData(theScannedRobot);
 		fire(1);
 	}
 
