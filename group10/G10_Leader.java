@@ -31,10 +31,9 @@ public class G10_Leader extends TeamRobot
 		// Robot main loop
 		while(true) {
 			// Replace the next 4 lines with any behavior you would like
-			ahead(100);
-			turnGunRight(360);
-			back(100);
-			turnGunRight(360);
+			setTurnGunRight(360);
+			AntiGravMove();
+			execute();
 		}
 	}
 
@@ -65,25 +64,28 @@ public class G10_Leader extends TeamRobot
 	}	
 	
 	
-	private void Calc() {
+	private void AntiGravCalc() {
     	double force;
     	double ang;
     	
+		xforce = 0;
+		yforce = 0;
+		
     	for(AntiGrav p: movingRobotMap) {
     		force = p.weight / Math.pow(getDistance(getX(), getY(), p.x, p.y), 2);	//a=W/R^2
-    		ang = Math.toDegrees(Math.PI / 2 - Math.atan2(getY() - p.y, getX() - p.x));	//力の向き
-    		xforce = force * Math.sin(ang);
-    		yforce = force * Math.cos(ang);
-    		//System.out.println("force:" + force);	//デバッグ用
-    		//System.out.println("ang:" + ang);	//デバッグ用
+    		ang = Math.PI / 2 - Math.atan2(getY() - p.y, getX() - p.x);	//力の向き
+    		xforce += force * Math.sin(ang);
+    		yforce += force * Math.cos(ang);
+    		System.out.println("xforce: " + xforce + " yforce: " + yforce); //デバッグ用
     	}
 	}
 	
 	//反重力移動メソッド
-	public void Move(){
+	public void AntiGravMove(){
+		AntiGravCalc();
 	    double dist = 20;	//移動距離
 	    double forceangle = toRobocodeDegrees(Math.toDegrees(Math.atan2(xforce, yforce)));	//力の向き
-	    double moveangle = toRobocodeDegrees(forceangle - getHeading());	//移動する向き
+	    double moveangle = forceangle - getHeading();	//移動する向き
 	    setTurnRight(moveangle);	//移動する方向を向く
 	    setAhead(dist);	//指定距離だけ進む
 	}
