@@ -4,8 +4,8 @@ import robocode.*;
 public class MovingRobot extends AntiGrav{
 	private double velocityX;
 	private double velocityY;
-	private double accelerationX;
-	private double accelerationY;
+	private double accelerationX=0;
+	private double accelerationY=0;
 	private double energy;
 	private String name;
 	private boolean isTarget = false;
@@ -13,8 +13,8 @@ public class MovingRobot extends AntiGrav{
 
 	private long timeStamp;
 
-	public MovingRobot(ScannedRobotEvent e, Robot informationProvider){
-		double scannedRobotRadians = Math.toRadians(informationProvider.getRadarHeading()) + e.getBearingRadians();
+	public MovingRobot(ScannedRobotEvent e, AdvancedRobot informationProvider){
+		double scannedRobotRadians = informationProvider.getHeadingRadians() + e.getBearingRadians();
 
 		x = informationProvider.getX() + e.getDistance() * Math.sin(scannedRobotRadians);
 		y = informationProvider.getY() + e.getDistance() * Math.cos(scannedRobotRadians);
@@ -27,8 +27,9 @@ public class MovingRobot extends AntiGrav{
 		timeStamp = e.getTime();
 	}
 	
-	public MovingRobot(){
+	public MovingRobot(){		// ダミーロボットとして利用
 		name = null;
+		energy = 500;
 	}
 
 
@@ -36,13 +37,13 @@ public class MovingRobot extends AntiGrav{
 		weight = theWeight;
 	}
 
-	public void setAcceleration(double accelerationX, double accelerationY){
-		accelerationX = accelerationX;
-		accelerationY = accelerationY;
+	public void setAcceleration(double inAccelerationX, double inAccelerationY){
+		accelerationX = inAccelerationX;
+		accelerationY = inAccelerationY;
 	}
 
-	public void setTarget(){
-		isTarget = true;
+	public void setTarget(boolean t){
+		isTarget = t;
 	}
 	
 	public void setEnemy(){
@@ -75,6 +76,22 @@ public class MovingRobot extends AntiGrav{
 
 	public long getTimeStamp(){
 		return timeStamp;
+	}
+
+	public double getEnergy(){
+		return energy;
+	}
+	
+	public boolean getTarget(){
+		return isTarget;
+	}
+
+	public double getAccelerationX(){
+		return accelerationX;
+	}
+
+	public double getAccelerationY(){
+		return accelerationY;
 	}
 
 }
