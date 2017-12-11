@@ -17,17 +17,17 @@ public class G10_Leader extends TeamRobot
 
 	private Set<FixedPointer> fixedPointerMap = new HashSet<FixedPointer>();
 	private MovingRobotMap movingRobotMap = new MovingRobotMap();
+	private double xforce, yforce;
 
 	public void run() {
-		FixedPointer fp = new FixedPointer(getBattleFieldWidth()/2, getBattleFieldHeight()/2, 1);
-		fixedPointerMap.add(fp);
+		fixedPointerMap.add(new FixedPointer(getBattleFieldWidth()/2, getBattleFieldHeight()/2, 0.5));
 		for(int x_i=0; x_i<=8; x_i++){
-			fixedPointerMap.add(new FixedPointer(this.getBattleFieldWidth()/8*x_i, (double)0, (double)1));
-			fixedPointerMap.add(new FixedPointer(this.getBattleFieldWidth()/8*x_i, getBattleFieldHeight(), (double)1));
+			fixedPointerMap.add(new FixedPointer(this.getBattleFieldWidth()/8*x_i, 0, 1));
+			fixedPointerMap.add(new FixedPointer(this.getBattleFieldWidth()/8*x_i, getBattleFieldHeight(), 0.5));
 		}
 		for(int y_i=1; y_i<6; y_i++){
 			fixedPointerMap.add(new FixedPointer(0, getBattleFieldHeight()/6*y_i, 1));
-			fixedPointerMap.add(new FixedPointer(getBattleFieldWidth(), getBattleFieldHeight()/6*y_i, 1));
+			fixedPointerMap.add(new FixedPointer(getBattleFieldWidth(), getBattleFieldHeight()/6*y_i, 0.5));
 		}
 		// Initialization of the robot should be put here
 
@@ -38,16 +38,20 @@ public class G10_Leader extends TeamRobot
 
 		// Robot main loop
 
+		AntiGravMove();
+		int i=0;	// 周期を稼ぐ制御変数
 		while(true) {
 			// Replace the next 4 lines with any behavior you would like
 			movingRobotMap.setTarget(); // これではいけない。とにかくTargetが更新されていってしまう
-			ahead(100);
-			turnGunRight(360);
-			back(100);
-			turnGunRight(360);
+			setTurnGunRight(360);
 			setTurnRadarLeftRadians(45);
 			movingRobotMap.printForDebug();
+			if(i++ == 2000){
+System.out.println("inif");
+				i=0;
+				AntiGravMove();
 			execute();
+			}
 		}
 	}
 
@@ -58,6 +62,7 @@ public class G10_Leader extends TeamRobot
 		// Replace the next line with any behavior you would like
 		System.out.println("Sccaned:"+ e.getName());
 		MovingRobot theScannedRobot = new MovingRobot(e, this);
+		theScannedRobot.setWeight(2);
 		movingRobotMap.updateTheData(theScannedRobot);
 		fire(1);
 	}
@@ -80,5 +85,89 @@ public class G10_Leader extends TeamRobot
 
 	public void onRobotDeath(RobotDeathEvent e){
 		movingRobotMap.removeRobot(e.getName());
+	}
+
+	private void AntiGravCalc() {
+    	double force;
+    	double ang;
+    	
+		xforce = 0;
+		yforce = 0;
+		//ロボからの反重力
+    	for(AntiGrav p: movingRobotMap) {
+    		force = p.weight / Math.pow(getDistance(getX(), getY(), p.x, p.y), 2);	//a=W/R^2
+    		ang = Math.PI / 2 - Math.atan2(getY() - p.y, getX() - p.x);	//力の向き
+    		xforce += force * Math.sin(ang);
+    		yforce += force * Math.cos(ang);
+    		//System.out.println("xforce: " + xforce + " yforce: " + yforce); //デバッグ用
+    	}
+    	//固定点からの反重力
+    	for(AntiGrav p: fixedPointerMap) {
+    		force = p.weight / Math.pow(getDistance(getX(), getY(), p.x, p.y), 3);	//a=W/R^3
+    		ang = Math.PI / 2 - Math.atan2(getY() - p.y, getX() - p.x);	//力の向き
+    		xforce += force * Math.sin(ang);
+    		yforce += force * Math.cos(ang);
+    		//System.out.println("x: " + p.x + " y: " + p.y);//デバッグ用
+    		//System.out.println("xforce: " + xforce + " yforce: " + yforce); //デバッグ用
+    	}
+    	
+	}
+	
+	//反重力移動メソッド
+	public void AntiGravMove(){
+		AntiGravCalc();
+		int dir = 1;
+	    double dist = 20;	//移動距離
+	    double forceangle = toRobocodeDegrees(Math.toDegrees(Math.atan2(yforce, xforce)));	//力の向き
+	    double moveangle = forceangle - getHeading();	//移動する向き
+	    //System.out.println("forceangle: " + forceangle); //デバッグ用
+	    //System.out.println("moveangle: " + moveangle); //デバッグ用
+	    
+	    
+	    //前進するか後退するか，右に曲がるか左に曲がるか決める
+	    if(Math.abs(moveangle) <= 90) {
+	    	dir = 1;
+	    }else {
+	    	//System.out.println("dir = -1");//デバッグ用
+	    	dir = -1;
+	    	if(moveangle >= 90) {
+	    		moveangle -= 180;
+	    	}else {
+	    		moveangle += 180;
+	    	}
+	    }
+	    
+	    setTurnRight(moveangle);	//移動する方向を向く
+	    setAhead(dist * dir);	//指定距離だけ進む
+	}
+	
+	//計算補助メソッド（2点間の距離を計算）
+	private double getDistance(double x1, double y1, double x2, double y2) {
+		double x = x2-x1;
+    	double y = y2-y1;
+    	double distance = Math.sqrt(x*x + y*y);
+    	return distance;  
+	}
+	
+	//計算補助メソッド（Robocode用の角度に調整(-180 < return <= 180)）
+	private double toRobocodeDegrees(double degrees) {
+		//テスト用
+		if((-180 <= degrees) && (degrees < -90)){
+			return (-270 - degrees);
+		}else if((-90 <= degrees) && (degrees < 270)) {
+			return (90 - degrees);
+		}else {
+			System.out.println("Error: toRobocodeDegrees()");
+			return (90 - degrees);
+		}
+		
+		/*//本番用
+		if(degrees < -90){
+			return (-270 - degrees);
+		}
+		else{
+			return (90 - degrees);
+		}
+		*/
 	}
 }
