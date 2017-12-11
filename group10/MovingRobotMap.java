@@ -54,6 +54,20 @@ public class MovingRobotMap extends HashSet<MovingRobot>{
 		lowerEnergyRobot.setTarget(true);
 	}
 
+	public double getTargetX(){
+		for(MovingRobot element: this){
+			if(element.getTarget()==true) return element.getx();
+		}
+		return 0;// ダミー
+	}
+
+	public double getTargetY(){
+		for(MovingRobot element: this){
+			if(element.getTarget()==true) return element.gety();
+		}
+		return 0;// ダミー
+	}
+
 	public double targetWillX(long theTime){
 		for(MovingRobot element: this){
 			if(element.getTarget()==true) return element.getWillX(theTime);
