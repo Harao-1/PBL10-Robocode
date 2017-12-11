@@ -17,17 +17,19 @@ public class G10_Leader extends TeamRobot
 
 	private Set<FixedPointer> fixedPointerMap = new HashSet<FixedPointer>();
 	private MovingRobotMap movingRobotMap = new MovingRobotMap();
+
+	final int FIXED_WEIGHT = 1;
 	private double xforce, yforce;
 
 	public void run() {
-		fixedPointerMap.add(new FixedPointer(getBattleFieldWidth()/2, getBattleFieldHeight()/2, 0.5));
+		fixedPointerMap.add(new FixedPointer(getBattleFieldWidth()/2, getBattleFieldHeight()/2, FIXED_WEIGHT));
 		for(int x_i=0; x_i<=8; x_i++){
-			fixedPointerMap.add(new FixedPointer(this.getBattleFieldWidth()/8*x_i, 0, 1));
-			fixedPointerMap.add(new FixedPointer(this.getBattleFieldWidth()/8*x_i, getBattleFieldHeight(), 0.5));
+			fixedPointerMap.add(new FixedPointer(this.getBattleFieldWidth()/8*x_i, 0, FIXED_WEIGHT));
+			fixedPointerMap.add(new FixedPointer(this.getBattleFieldWidth()/8*x_i, getBattleFieldHeight(), FIXED_WEIGHT));
 		}
 		for(int y_i=1; y_i<6; y_i++){
-			fixedPointerMap.add(new FixedPointer(0, getBattleFieldHeight()/6*y_i, 1));
-			fixedPointerMap.add(new FixedPointer(getBattleFieldWidth(), getBattleFieldHeight()/6*y_i, 0.5));
+			fixedPointerMap.add(new FixedPointer(0, getBattleFieldHeight()/6*y_i, FIXED_WEIGHT));
+			fixedPointerMap.add(new FixedPointer(getBattleFieldWidth(), getBattleFieldHeight()/6*y_i, FIXED_WEIGHT));
 		}
 		// Initialization of the robot should be put here
 
@@ -88,6 +90,8 @@ System.out.println("inif");
 	}
 
 	private void AntiGravCalc() {
+
+	final int FIXED_EXPONENT = 2;
     	double force;
     	double ang;
     	
@@ -103,7 +107,7 @@ System.out.println("inif");
     	}
     	//固定点からの反重力
     	for(AntiGrav p: fixedPointerMap) {
-    		force = p.weight / Math.pow(getDistance(getX(), getY(), p.x, p.y), 3);	//a=W/R^3
+    		force = p.weight / Math.pow(getDistance(getX(), getY(), p.x, p.y), FIXED_EXPONENT);	//a=W/R^3
     		ang = Math.PI / 2 - Math.atan2(getY() - p.y, getX() - p.x);	//力の向き
     		xforce += force * Math.sin(ang);
     		yforce += force * Math.cos(ang);
