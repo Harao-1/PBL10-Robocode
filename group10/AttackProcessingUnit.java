@@ -6,7 +6,7 @@ public class AttackProcessingUnit {
 	private AdvancedRobot theRobot;
 	private MovingRobotMap theMap;
 
-	private double distance = Math.sqrt(Math.pow((theMap.targetX - getX()), 2) + (theMap.targetY - getY()), 2); //ターゲットと自機との距離
+	private double distance = Math.sqrt(Math.pow((theMap.getTargetX() - theRobot.getX()), 2) + Math.pow((theMap.getTargetY() - theRobot.getY()), 2)); //ターゲットと自機との距離
 	private double power = 1.1; //弾の威力
 	private long attackTime = distance / (20 - 3 * power); //弾がターゲットに当たるまでの時間
 
@@ -27,7 +27,7 @@ public class AttackProcessingUnit {
 		targetDegrees = Math.toDegrees(Math.atan((theMap.targetWillY(theRobot.getTime() + attackTime) - theRobot.getY()) / (theMap.targetWillX(theRobot.getTime() + attackTime) - theRobot.getX())));
 	}
 	
-	double remainderDegrees = targetDegrees - getGunHeading(); //ターゲットと砲台の向きの差
+	double remainderDegrees = targetDegrees - theRobot.getGunHeading(); //ターゲットと砲台の向きの差
 	if(remainderDegrees < -360) {
 		turnGunLeft(- remainderDegrees - 360);
 	} else if(remainderDegrees >= -360 && remainderDegrees < -180) {
