@@ -65,10 +65,10 @@ public class G10_Leader extends TeamRobot
 	/**
 	 * onHitByBullet: What to do when you're hit by a bullet
 	 */
-	public void onHitByBullet(HitByBulletEvent e) {
+/*	public void onHitByBullet(HitByBulletEvent e) {
 		// Replace the next line with any behavior you would like
 		back(10);
-	}
+	}*/
 	
 	/**
 	 * onHitWall: What to do when you hit a wall
