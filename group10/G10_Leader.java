@@ -1,6 +1,7 @@
 package group10;
 import robocode.*;
 import java.util.*;
+import java.awt.Color;
 
 //import java.awt.Color;
 
@@ -18,10 +19,15 @@ public class G10_Leader extends TeamRobot
 	private Set<FixedPointer> fixedPointerMap = new HashSet<FixedPointer>();
 	private MovingRobotMap movingRobotMap = new MovingRobotMap();
 
+	private AttackProcessingUnit APU = new AttackProcessingUnit(this, movingRobotMap);
+
 	final int FIXED_WEIGHT = 1;
 	private double xforce, yforce;
 
 	public void run() {
+
+		setColors(Color.green, Color.red, Color.blue);
+
 		fixedPointerMap.add(new FixedPointer(getBattleFieldWidth()/2, getBattleFieldHeight()/2, FIXED_WEIGHT));
 		for(int x_i=0; x_i<=8; x_i++){
 			fixedPointerMap.add(new FixedPointer(this.getBattleFieldWidth()/8*x_i, 0, FIXED_WEIGHT));
@@ -42,18 +48,24 @@ public class G10_Leader extends TeamRobot
 
 		AntiGravMove();
 		int i=0;	// 周期を稼ぐ制御変数
+		long standardTime = getTime();
+			System.out.println("1st");
 		while(true) {
-			// Replace the next 4 lines with any behavior you would like
-			movingRobotMap.setTarget(); // これではいけない。とにかくTargetが更新されていってしまう
-			setTurnGunRight(360);
 			setTurnRadarLeftRadians(45);
+			movingRobotMap.setTarget(); // これではいけない。とにかくTargetが更新されていってしまう
+			execute();
+//			if(getTime() - standardTime > 20){
+			// Replace the next 4 lines with any behavior you would like
+//			setTurnGunRight(360);
+			standardTime = getTime();
 			movingRobotMap.printForDebug();
-			if(i++ == 2000){
-System.out.println("inif");
-				i=0;
+/*			if(i++ == 2000){
+				i=0;*/
 				AntiGravMove();
 			execute();
-			}
+			//APU.processing();
+		//	}
+//			}
 		}
 	}
 

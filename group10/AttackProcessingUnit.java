@@ -6,9 +6,7 @@ public class AttackProcessingUnit {
 	private AdvancedRobot theRobot;
 	private MovingRobotMap theMap;
 
-	private double distance = Math.sqrt(Math.pow((theMap.getTargetX() - theRobot.getX()), 2) + Math.pow((theMap.getTargetY() - theRobot.getY()), 2)); //ターゲットと自機との距離
 	private double power = 1.1; //弾の威力
-	private long attackTime = distance / (20 - 3 * power); //弾がターゲットに当たるまでの時間
 
 	public AttackProcessingUnit(AdvancedRobot inRobot, MovingRobotMap inMap){
 		theRobot = inRobot;
@@ -16,6 +14,10 @@ public class AttackProcessingUnit {
 	}
 	
 	public void processing(){
+
+	double distance = Math.sqrt(Math.pow((theMap.getTargetX() - theRobot.getX()), 2) + Math.pow((theMap.getTargetY() - theRobot.getY()), 2)); //ターゲットと自機との距離
+	long attackTime = new Double(distance / (20 - 3 * power)).longValue(); //弾がターゲットに当たるまでの時間
+
 	double targetDegrees; //ターゲットの向きの角度(-180度〜180度)
 	if(theMap.targetWillX(theRobot.getTime() + attackTime) == theRobot.getX()) {
 		if(theMap.targetWillY(theRobot.getTime() + attackTime) > theRobot.getY()) {
@@ -27,20 +29,35 @@ public class AttackProcessingUnit {
 		targetDegrees = Math.toDegrees(Math.atan((theMap.targetWillY(theRobot.getTime() + attackTime) - theRobot.getY()) / (theMap.targetWillX(theRobot.getTime() + attackTime) - theRobot.getX())));
 	}
 	
-	double remainderDegrees = targetDegrees - theRobot.getGunHeading(); //ターゲットと砲台の向きの差
+	double remainderDegrees =  180 + targetDegrees - theRobot.getGunHeading(); //ターゲットと砲台の向きの差
 	if(remainderDegrees < -360) {
-		turnGunLeft(- remainderDegrees - 360);
+		theRobot.turnGunLeft(- remainderDegrees - 360);
 	} else if(remainderDegrees >= -360 && remainderDegrees < -180) {
-		turnGunRight(remainderDegrees + 360);
+		theRobot.turnGunRight(remainderDegrees + 360);
 	} else if(remainderDegrees >= -180 && remainderDegrees < 0) {
-		turnGunLeft(-remainderDegrees);
+		theRobot.turnGunLeft(-remainderDegrees);
 	} else if(remainderDegrees >= 0 && remainderDegrees < 180) {
-		turnGunRight(remainderDegrees);
+		theRobot.turnGunRight(remainderDegrees);
 	} else if(remainderDegrees >= 180 && remainderDegrees < 360) {
-		turnGunLeft(360 - remainderDegrees);
+		theRobot.turnGunLeft(360 - remainderDegrees);
 	} else if(remainderDegrees >= 360) {
-		turnGunRight(remainderDegrees - 360);
+		theRobot.turnGunRight(remainderDegrees - 360);
 	} //ターゲットと砲台の向きを揃える
+
+	theRobot.execute();
+	long standardTime = theRobot.getTime();
+	theRobot.execute();
+	while(true){
+		if(theRobot.getGunHeat()>-10) break;
+		long tmpTime = theRobot.getTime() - standardTime;
+		theRobot.execute();
+		if(tmpTime > 10){
+	theRobot.fire(power);
+	theRobot.execute();
+	break;
+		}
+	}
+
 	}
 	
 	/**
