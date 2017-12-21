@@ -1,5 +1,4 @@
 package group10;
-import robocode.*;
 
 public class AntiGrav{
 	double x;

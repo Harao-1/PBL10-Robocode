@@ -1,92 +1,58 @@
 package group10;
-import java.util.HashSet;
 import java.util.Set;
 
 import robocode.*;
-//import java.awt.Color;
 
-// API help : http://robocode.sourceforge.net/docs/robocode/robocode/Robot.html
-
-/**
- * G10_Leader - a robot by (your name here)
- */
-public class G10_Leader_AntiGravMove extends TeamRobot
-{
-	/**
-	 * run: G10_Leader's default behavior
-	 */
-
-	private Set<FixedPointer> fixedPointerMap = new HashSet<FixedPointer>();
-	private MovingRobotMap movingRobotMap = new MovingRobotMap();
+public class AntiGravMoveUnit {
 	private double xforce, yforce;
-
-	public void run() {
-		// Initialization of the robot should be put here
-
-		// After trying out your robot, try uncommenting the import at the top,
-		// and the next line:
-
-		// setColors(Color.red,Color.blue,Color.green); // body,gun,radar
-
-		// Robot main loop
-		while(true) {
-			// Replace the next 4 lines with any behavior you would like
-			setTurnGunRight(360);
-			AntiGravMove();
-			execute();
-		}
-	}
-
-	/**
-	 * onScannedRobot: What to do when you see another robot
-	 */
-	public void onScannedRobot(ScannedRobotEvent e) {
-		// Replace the next line with any behavior you would like
-		MovingRobot theScannedRobot = new MovingRobot(e, this);
-		movingRobotMap.updateTheData(theScannedRobot);
-		fire(1);
-	}
-
-	/**
-	 * onHitByBullet: What to do when you're hit by a bullet
-	 */
-	public void onHitByBullet(HitByBulletEvent e) {
-		// Replace the next line with any behavior you would like
-		back(10);
-	}
+	private AdvancedRobot robot;
+	private MovingRobotMap map;
+	private Set<FixedPointer> fixedPointerMap;
 	
-	/**
-	 * onHitWall: What to do when you hit a wall
-	 */
-	public void onHitWall(HitWallEvent e) {
-		// Replace the next line with any behavior you would like
-		back(20);
-	}	
-	
+	AntiGravMoveUnit(AdvancedRobot r, MovingRobotMap m, Set<FixedPointer> f){
+		robot = r;
+		map = m;
+		fixedPointerMap = f;
+	}
 	
 	private void AntiGravCalc() {
+
     	double force;
     	double ang;
     	
 		xforce = 0;
 		yforce = 0;
 		//ロボからの反重力
-    	for(AntiGrav p: movingRobotMap) {
-    		force = p.weight / Math.pow(getDistance(getX(), getY(), p.x, p.y), 2);	//a=W/R^2
-    		ang = Math.PI / 2 - Math.atan2(getY() - p.y, getX() - p.x);	//力の向き
+    	for(AntiGrav p: map) {
+    		force = p.weight / Math.pow(getDistance(robot.getX(), robot.getY(), p.x, p.y), 2);	//a=W/R^2
+    		ang = Math.PI / 2 - Math.atan2(robot.getY() - p.y, robot.getX() - p.x);	//力の向き
     		xforce += force * Math.sin(ang);
     		yforce += force * Math.cos(ang);
     		//System.out.println("xforce: " + xforce + " yforce: " + yforce); //デバッグ用
     	}
+    	
     	//固定点からの反重力
     	for(AntiGrav p: fixedPointerMap) {
-    		force = p.weight / Math.pow(getDistance(getX(), getY(), p.x, p.y), 3);	//a=W/R^3
-    		ang = Math.PI / 2 - Math.atan2(getY() - p.y, getX() - p.x);	//力の向き
+    		force = p.weight / Math.pow(getDistance(robot.getX(), robot.getY(), p.x, p.y), 2);	//a=W/R^3
+    		ang = Math.PI / 2 - Math.atan2(robot.getY() - p.y, robot.getX() - p.x);	//力の向き
     		xforce += force * Math.sin(ang);
     		yforce += force * Math.cos(ang);
     		//System.out.println("x: " + p.x + " y: " + p.y);//デバッグ用
     		//System.out.println("xforce: " + xforce + " yforce: " + yforce); //デバッグ用
     	}
+    	
+    	/*
+    	//壁からの重力
+    	final double WALLFORCE = 50;
+    	xforce += WALLFORCE / Math.pow(getDistance(robot.getX(), robot.getY(),
+    	 robot.getBattleFieldWidth(), robot.getY()), 3);
+    	xforce -= WALLFORCE/Math.pow(getDistance(robot.getX(), robot.getY(),
+    	 0, robot.getY()), 3);
+    	yforce += WALLFORCE/Math.pow(getDistance(robot.getX(), robot.getY(),
+    	 robot.getX(), robot.getBattleFieldHeight()), 3);
+    	yforce -= WALLFORCE/Math.pow(getDistance(robot.getX(), robot.getY(),
+    	 robot.getX(), 0), 3);
+    	 */
     	
 	}
 	
@@ -96,7 +62,7 @@ public class G10_Leader_AntiGravMove extends TeamRobot
 		int dir = 1;
 	    double dist = 20;	//移動距離
 	    double forceangle = toRobocodeDegrees(Math.toDegrees(Math.atan2(yforce, xforce)));	//力の向き
-	    double moveangle = forceangle - getHeading();	//移動する向き
+	    double moveangle = forceangle - robot.getHeading();	//移動する向き
 	    //System.out.println("forceangle: " + forceangle); //デバッグ用
 	    //System.out.println("moveangle: " + moveangle); //デバッグ用
 	    
@@ -114,8 +80,8 @@ public class G10_Leader_AntiGravMove extends TeamRobot
 	    	}
 	    }
 	    
-	    setTurnRight(moveangle);	//移動する方向を向く
-	    setAhead(dist * dir);	//指定距離だけ進む
+	    robot.setTurnRight(moveangle);	//移動する方向を向く
+	    robot.setAhead(dist * dir);	//指定距離だけ進む
 	}
 	
 	//計算補助メソッド（2点間の距離を計算）
