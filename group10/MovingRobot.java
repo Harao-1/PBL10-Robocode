@@ -46,8 +46,8 @@ public class MovingRobot extends AntiGrav{
 		isTarget = t;
 	}
 	
-	public void setEnemy(){
-		isEnemy = true;
+	public void setEnemy(boolean t){
+		isEnemy = t;
 	}
 
 	public String getName(){

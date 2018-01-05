@@ -47,25 +47,17 @@ public class G10_Leader extends TeamRobot
 
 		// Robot main loop
 
-		int i=0;	// 周期を稼ぐ制御変数
-		long standardTime = getTime();
-			System.out.println("1st");
+		turnRadarLeftRadians(90);
+		movingRobotMap.setTarget();
+
 		while(true) {
 			setTurnRadarLeftRadians(45);
-			movingRobotMap.setTarget(); // これではいけない。とにかくTargetが更新されていってしまう
 			execute();
-//			if(getTime() - standardTime > 20){
 			// Replace the next 4 lines with any behavior you would like
-//			setTurnGunRight(360);
-			standardTime = getTime();
-			movingRobotMap.printForDebug();
-/*			if(i++ == 2000){
-				i=0;*/
+			//movingRobotMap.printForDebug();
 			AGMU.AntiGravMove();
 			execute();
 			//APU.processing();
-		//	}
-//			}
 		}
 	}
 
@@ -74,11 +66,9 @@ public class G10_Leader extends TeamRobot
 	 */
 	public void onScannedRobot(ScannedRobotEvent e) {
 		// Replace the next line with any behavior you would like
-		System.out.println("Sccaned:"+ e.getName());
 		MovingRobot theScannedRobot = new MovingRobot(e, this);
 		theScannedRobot.setWeight(ROBOT_WEIGHT);
 		movingRobotMap.updateTheData(theScannedRobot);
-		fire(1);
 	}
 
 	/**
@@ -98,6 +88,8 @@ public class G10_Leader extends TeamRobot
 	}	
 
 	public void onRobotDeath(RobotDeathEvent e){
+		if(movingRobotMap.getTarget().getName().equals(e.getName())) movingRobotMap.setTarget();
+		// 破壊されたロボットの名前がTargetの名前と一致した場合は新たなターゲットを設定
 		movingRobotMap.removeRobot(e.getName());
 	}
 }

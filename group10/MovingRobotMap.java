@@ -4,10 +4,16 @@ import java.util.*;
 public class MovingRobotMap extends HashSet<MovingRobot>{
 
 	public void updateTheData(MovingRobot newData){
+
+		String newName = newData.getName();
+
+		if(!(newName.matches("group10.*"))){
+			newData.setEnemy(true);
+		}
+
 		for(MovingRobot element: this){
 			long timeInterval = newData.getTimeStamp() - element.getTimeStamp();
-			if(element.getName().equals(newData.getName())==true && timeInterval<6){
-				System.out.println("hi");//debug
+			if(element.getName().equals(newName)==true && timeInterval<6){
 				double theAccelerationX, theAccelerationY;
 				theAccelerationX = (newData.getVelocityX() - element.getVelocityX()) / timeInterval;
 				theAccelerationY = (newData.getVelocityY() - element.getVelocityY()) / timeInterval;
@@ -51,6 +57,13 @@ public class MovingRobotMap extends HashSet<MovingRobot>{
 		}
 
 		lowerEnergyRobot.setTarget(true);
+	}
+
+	public MovingRobot getTarget(){
+		for(MovingRobot e: this){
+			if(e.getTarget()==true) return e;
+		}
+		return new MovingRobot();
 	}
 
 	public double getTargetX(){
