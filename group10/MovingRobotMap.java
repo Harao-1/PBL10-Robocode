@@ -13,12 +13,14 @@ public class MovingRobotMap extends HashSet<MovingRobot>{
 
 		for(MovingRobot element: this){
 			long timeInterval = newData.getTimeStamp() - element.getTimeStamp();
-			if(element.getName().equals(newName)==true && timeInterval<6){
-				double theAccelerationX, theAccelerationY;
-				theAccelerationX = (newData.getVelocityX() - element.getVelocityX()) / timeInterval;
-				theAccelerationY = (newData.getVelocityY() - element.getVelocityY()) / timeInterval;
+			if(element.getName().equals(newName)==true){
+				if(timeInterval<6){
+					double theAccelerationX, theAccelerationY;
+					theAccelerationX = (newData.getVelocityX() - element.getVelocityX()) / timeInterval;
+					theAccelerationY = (newData.getVelocityY() - element.getVelocityY()) / timeInterval;
 
-				newData.setAcceleration(theAccelerationX, theAccelerationY);
+					newData.setAcceleration(theAccelerationX, theAccelerationY);
+				}
 				this.add(newData);
 				this.remove(element);
 				return;
