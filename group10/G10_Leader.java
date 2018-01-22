@@ -79,7 +79,8 @@ public class G10_Leader extends TeamRobot
 		theScannedRobot.setWeight(ROBOT_WEIGHT);
 		movingRobotMap.updateTheData(theScannedRobot);
 		try{
-			broadcastMessage(e.getName() + "," + getTime() + "," + e.getEnergy() + "," + e.getBearing() + "," + e.getDistance() + "," + e.getVelocity() + "," + this.getHeadingRadians() + "," + this.getX() + "," + this.getY());
+			MessagePack thePack = new MessagePack(e, this);
+			broadcastMessage(thePack);
 		}catch(IOException ex){
 			System.out.println("Error");
 		}//名前、時間、エネルギー、向き、距離、速度、(自分の)傾き、X座標、Y座標

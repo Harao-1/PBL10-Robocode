@@ -189,10 +189,10 @@ public class G10_Sub1 extends TeamRobot
 		*/
 	}
 	public void onMessageReceived(MessageEvent me){
-		System.out.println("message: " + me.getMessage());
 		Object msg = me.getMessage();
-		String theMessage = (String) msg;
-		MovingRobot theScannedRobot = new MovingRobot(theMessage);
+		MessagePack thePack = (MessagePack) msg;
+		MovingRobot theScannedRobot = new MovingRobot(thePack);
+		System.out.println("MessageTest:" + thePack.getEvent().getName());
 		theScannedRobot.setWeight(2);
 		movingRobotMap.updateTheData(theScannedRobot);
 		fire(1);
