@@ -2,6 +2,7 @@ package group10;
 import robocode.*;
 import java.util.*;
 import java.awt.Color;
+import java.io.*;
 
 //import java.awt.Color;
 
@@ -23,7 +24,7 @@ public class G10_Leader extends TeamRobot
 	private AntiGravMoveUnit AGMU = new AntiGravMoveUnit(this, movingRobotMap, fixedPointerMap);
 
 	final int FIXED_WEIGHT = 1;
-	final int ROBOT_WEIGHT = 2;
+	final int ROBOT_WEIGHT = 10000;
 
 	public void run() {
 
@@ -47,17 +48,24 @@ public class G10_Leader extends TeamRobot
 
 		// Robot main loop
 
-		turnRadarLeftRadians(90);
-		movingRobotMap.setTarget();
-
+		int i=0;	// 周期を稼ぐ制御変数
+		long standardTime = getTime();
+			System.out.println("1st");
 		while(true) {
 			setTurnRadarLeftRadians(45);
+			movingRobotMap.setTarget(); // これではいけない。とにかくTargetが更新されていってしまう
 			execute();
+//			if(getTime() - standardTime > 20){
 			// Replace the next 4 lines with any behavior you would like
-			//movingRobotMap.printForDebug();
+//			setTurnGunRight(360);
+			standardTime = getTime();
+/*			if(i++ == 2000){
+				i=0;*/
 			AGMU.AntiGravMove();
 			execute();
 			//APU.processing();
+		//	}
+//			}
 		}
 	}
 
@@ -66,11 +74,16 @@ public class G10_Leader extends TeamRobot
 	 */
 	public void onScannedRobot(ScannedRobotEvent e) {
 		// Replace the next line with any behavior you would like
+		//System.out.println("Sccaned:"+ e.getName());
 		MovingRobot theScannedRobot = new MovingRobot(e, this);
 		theScannedRobot.setWeight(ROBOT_WEIGHT);
 		movingRobotMap.updateTheData(theScannedRobot);
+		try{
+			broadcastMessage(e.getName() + "," + getTime() + "," + e.getEnergy() + "," + e.getBearing() + "," + e.getDistance() + "," + e.getVelocity() + "," + this.getHeadingRadians() + "," + this.getX() + "," + this.getY());
+		}catch(IOException ex){
+			System.out.println("Error");
+		}//名前、時間、エネルギー、向き、距離、速度、(自分の)傾き、X座標、Y座標
 	}
-
 	/**
 	 * onHitByBullet: What to do when you're hit by a bullet
 	 */
@@ -78,18 +91,8 @@ public class G10_Leader extends TeamRobot
 		// Replace the next line with any behavior you would like
 		back(10);
 	}*/
-	
-	/**
-	 * onHitWall: What to do when you hit a wall
-	 */
-	public void onHitWall(HitWallEvent e) {
-		// Replace the next line with any behavior you would like
-		back(20);
-	}	
 
 	public void onRobotDeath(RobotDeathEvent e){
-		if(movingRobotMap.getTarget().getName().equals(e.getName())) movingRobotMap.setTarget();
-		// 破壊されたロボットの名前がTargetの名前と一致した場合は新たなターゲットを設定
 		movingRobotMap.removeRobot(e.getName());
 	}
 }

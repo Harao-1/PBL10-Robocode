@@ -2,6 +2,7 @@ package group10;
 import robocode.*;
 import java.util.*;
 import java.awt.Color;
+import java.io.*;
 
 //import java.awt.Color;
 
@@ -186,5 +187,14 @@ public class G10_Sub1 extends TeamRobot
 			return (90 - degrees);
 		}
 		*/
+	}
+	public void onMessageReceived(MessageEvent me){
+		System.out.println("message: " + me.getMessage());
+		Object msg = me.getMessage();
+		String theMessage = (String) msg;
+		MovingRobot theScannedRobot = new MovingRobot(theMessage);
+		theScannedRobot.setWeight(2);
+		movingRobotMap.updateTheData(theScannedRobot);
+		fire(1);
 	}
 }

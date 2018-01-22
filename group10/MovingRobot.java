@@ -26,6 +26,32 @@ public class MovingRobot extends AntiGrav{
 
 		timeStamp = e.getTime();
 	}
+
+	public MovingRobot(String theMessage){
+		String[] theSp = theMessage.split(",", 0);
+		//0.名前、1.時間、2.エネルギー、3.向き、4.距離、5.速度、6.(自分の)傾き、7.X座標、8.Y座標
+		int[] theSplit = new int[9];
+		theSplit[1] = Integer.parseInt(theSp[1]);
+		theSplit[2] = Integer.parseInt(theSp[2]);
+		theSplit[3] = Integer.parseInt(theSp[3]);
+		theSplit[4] = Integer.parseInt(theSp[4]);
+		theSplit[5] = Integer.parseInt(theSp[5]);
+		theSplit[6] = Integer.parseInt(theSp[6]);
+		theSplit[7] = Integer.parseInt(theSp[7]);
+		theSplit[8] = Integer.parseInt(theSp[8]);
+		double scannedRobotRadians = theSplit[6] + theSplit[3];
+
+		x = theSplit[7] + theSplit[4] * Math.sin(scannedRobotRadians);
+		y = theSplit[8] + theSplit[4] * Math.cos(scannedRobotRadians);
+		velocityX = theSplit[5] * Math.sin(theSplit[3]);
+		velocityY = theSplit[5] * Math.cos(theSplit[3]);
+
+		energy = theSplit[2];
+		name = theSp[0];
+		timeStamp = theSplit[1];
+		System.out.println("String: y is" + this.gety());
+		System.out.println("String: Name is" + this.getName());
+	}
 	
 	public MovingRobot(){		// ダミーロボットとして利用
 		name = null;
