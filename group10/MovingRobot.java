@@ -31,6 +31,10 @@ public class MovingRobot extends AntiGrav{
 		name = null;
 		energy = 500;
 	}
+	
+	public boolean IsEnemy() {
+		return isEnemy;
+	}
 
 
 	public void setWeight(double theWeight){
@@ -46,24 +50,36 @@ public class MovingRobot extends AntiGrav{
 		isTarget = t;
 	}
 	
-	public void setEnemy(){
-		isEnemy = true;
+	public void setEnemy(boolean t){
+		isEnemy = t;
 	}
 
 	public String getName(){
 		return name;
 	}
 
-	public double getWillX(long theTime){
-		long interval = theTime - timeStamp;
+	public double getWillX_A(double theTime){
+		double interval = theTime - timeStamp;
 
 		return x + velocityX * interval + accelerationX * Math.pow(interval, 2) / 2;
 	}
+	
+	public double getWillX_V(double theTime){
+		double interval = theTime - timeStamp;
 
-	public double getWillY(long theTime){
-		long interval = theTime - timeStamp;
+		return x + velocityX * interval;
+	}
+
+	public double getWillY_A(double theTime){
+		double interval = theTime - timeStamp;
 
 		return y + velocityY * interval + accelerationY * Math.pow(interval, 2) / 2;
+	}
+	
+	public double getWillY_V(double theTime){
+		double interval = theTime - timeStamp;
+
+		return y + velocityY * interval;
 	}
 
 	public double getVelocityX(){

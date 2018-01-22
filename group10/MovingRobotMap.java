@@ -4,15 +4,23 @@ import java.util.*;
 public class MovingRobotMap extends HashSet<MovingRobot>{
 
 	public void updateTheData(MovingRobot newData){
+
+		String newName = newData.getName();
+
+		if(!(newName.matches("group10.*"))){
+			newData.setEnemy(true);
+		}
+
 		for(MovingRobot element: this){
 			long timeInterval = newData.getTimeStamp() - element.getTimeStamp();
-			if(element.getName().equals(newData.getName())==true && timeInterval<6){
-				System.out.println("hi");//debug
-				double theAccelerationX, theAccelerationY;
-				theAccelerationX = (newData.getVelocityX() - element.getVelocityX()) / timeInterval;
-				theAccelerationY = (newData.getVelocityY() - element.getVelocityY()) / timeInterval;
+			if(element.getName().equals(newName)==true){
+				if(timeInterval<6){
+					double theAccelerationX, theAccelerationY;
+					theAccelerationX = (newData.getVelocityX() - element.getVelocityX()) / timeInterval;
+					theAccelerationY = (newData.getVelocityY() - element.getVelocityY()) / timeInterval;
 
-				newData.setAcceleration(theAccelerationX, theAccelerationY);
+					newData.setAcceleration(theAccelerationX, theAccelerationY);
+				}
 				this.add(newData);
 				this.remove(element);
 				return;
@@ -53,6 +61,13 @@ public class MovingRobotMap extends HashSet<MovingRobot>{
 		lowerEnergyRobot.setTarget(true);
 	}
 
+	public MovingRobot getTarget(){
+		for(MovingRobot e: this){
+			if(e.getTarget()==true) return e;
+		}
+		return new MovingRobot();
+	}
+
 	public double getTargetX(){
 		for(MovingRobot element: this){
 			if(element.getTarget()==true) return element.getx();
@@ -69,14 +84,14 @@ public class MovingRobotMap extends HashSet<MovingRobot>{
 
 	public double targetWillX(long theTime){
 		for(MovingRobot element: this){
-			if(element.getTarget()==true) return element.getWillX(theTime);
+			if(element.getTarget()==true) return element.getWillX_A(theTime);
 		}
 		return 0;// ダミー
 	}
 
 	public double targetWillY(long theTime){
 		for(MovingRobot element: this){
-			if(element.getTarget()==true) return element.getWillY(theTime);
+			if(element.getTarget()==true) return element.getWillY_A(theTime);
 		}
 		return 0;// ダミー
 	}

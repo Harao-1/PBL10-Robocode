@@ -4,7 +4,7 @@ import java.util.Set;
 import robocode.*;
 
 public class AntiGravMoveUnit {
-	private double xforce, yforce;
+	private double xforce, yforce,r_xforce, r_yforce,w_xforce,w_yforce;
 	private AdvancedRobot robot;
 	private MovingRobotMap map;
 	private Set<FixedPointer> fixedPointerMap;
@@ -20,40 +20,53 @@ public class AntiGravMoveUnit {
     	double force;
     	double ang;
     	
-		xforce = 0;
-		yforce = 0;
+    	xforce = 0;
+    	yforce = 0;
+		r_xforce = 0;
+		r_yforce = 0;
+		w_xforce = 0;
+		w_yforce = 0;
 		//ロボからの反重力
     	for(AntiGrav p: map) {
     		force = p.weight / Math.pow(getDistance(robot.getX(), robot.getY(), p.x, p.y), 2);	//a=W/R^2
     		ang = Math.PI / 2 - Math.atan2(robot.getY() - p.y, robot.getX() - p.x);	//力の向き
-    		xforce += force * Math.sin(ang);
-    		yforce += force * Math.cos(ang);
-    		//System.out.println("xforce: " + xforce + " yforce: " + yforce); //デバッグ用
+    		r_xforce += force * Math.sin(ang);
+    		r_yforce += force * Math.cos(ang);
+    		/*
+    		ang = Math.atan2(robot.getY() - p.y, robot.getX() - p.x);	//力の向き
+    		xforce += force * Math.cos(ang);
+    		yforce += force * Math.sin(ang);
+    		*/
+    		//System.out.println("r_xforce: " + r_xforce + " r_yforce: " + r_yforce); //デバッグ用
     	}
     	
     	//固定点からの反重力
     	for(AntiGrav p: fixedPointerMap) {
     		force = p.weight / Math.pow(getDistance(robot.getX(), robot.getY(), p.x, p.y), 2);	//a=W/R^3
     		ang = Math.PI / 2 - Math.atan2(robot.getY() - p.y, robot.getX() - p.x);	//力の向き
-    		xforce += force * Math.sin(ang);
-    		yforce += force * Math.cos(ang);
+    		r_xforce += force * Math.sin(ang);
+    		r_yforce += force * Math.cos(ang);
     		//System.out.println("x: " + p.x + " y: " + p.y);//デバッグ用
     		//System.out.println("xforce: " + xforce + " yforce: " + yforce); //デバッグ用
     	}
     	
-    	/*
     	//壁からの重力
-    	final double WALLFORCE = 50;
-    	xforce += WALLFORCE / Math.pow(getDistance(robot.getX(), robot.getY(),
-    	 robot.getBattleFieldWidth(), robot.getY()), 3);
-    	xforce -= WALLFORCE/Math.pow(getDistance(robot.getX(), robot.getY(),
-    	 0, robot.getY()), 3);
-    	yforce += WALLFORCE/Math.pow(getDistance(robot.getX(), robot.getY(),
-    	 robot.getX(), robot.getBattleFieldHeight()), 3);
-    	yforce -= WALLFORCE/Math.pow(getDistance(robot.getX(), robot.getY(),
-    	 robot.getX(), 0), 3);
-    	 */
+    	final double WALLFORCE = 500000;
+    	final int WALLNUMBER = 3;
+    	w_xforce -= WALLFORCE / Math.pow(getDistance(robot.getX(), robot.getY(),
+    	 robot.getBattleFieldWidth(), robot.getY()), WALLNUMBER);
+    	w_xforce += WALLFORCE / Math.pow(getDistance(robot.getX(), robot.getY(),
+    	 0, robot.getY()), WALLNUMBER);
+    	w_yforce -= WALLFORCE / Math.pow(getDistance(robot.getX(), robot.getY(),
+    	 robot.getX(), robot.getBattleFieldHeight()), WALLNUMBER);
+    	w_yforce += WALLFORCE / Math.pow(getDistance(robot.getX(), robot.getY(),
+    	 robot.getX(), 0), WALLNUMBER);
     	
+    	//System.out.println("w_xforce: " + w_xforce + " w_yforce: " + w_yforce); //デバッグ用
+    	
+    	xforce = r_xforce + w_xforce;
+    	yforce = r_yforce + w_yforce;
+    	//System.out.println("xforce: " + xforce + " yforce: " + yforce); //デバッグ用
 	}
 	
 	//反重力移動メソッド
@@ -62,7 +75,7 @@ public class AntiGravMoveUnit {
 		int dir = 1;
 	    double dist = 20;	//移動距離
 	    double forceangle = toRobocodeDegrees(Math.toDegrees(Math.atan2(yforce, xforce)));	//力の向き
-	    double moveangle = forceangle - robot.getHeading();	//移動する向き
+	    double moveangle = changeDegrees(forceangle - robot.getHeading());	//移動する向き
 	    //System.out.println("forceangle: " + forceangle); //デバッグ用
 	    //System.out.println("moveangle: " + moveangle); //デバッグ用
 	    
@@ -112,5 +125,17 @@ public class AntiGravMoveUnit {
 			return (90 - degrees);
 		}
 		*/
+	}
+	
+	//計算補助メソッド（(角度調整用メソッド)return -180 <= degrees <= 180）
+	private double changeDegrees(double degrees) {
+		//System.out.println(degrees);	//デバッグ用
+		if(degrees <= -180) {
+			return 360 + degrees;
+		}else if(degrees >= 180) {
+			return -360 + degrees;
+		}else {
+			return degrees;
+		}
 	}
 }
